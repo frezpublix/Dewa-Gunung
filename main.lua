@@ -1634,22 +1634,17 @@ Toggle_Y = Tab:CreateToggle({
     end,
 })
 
--- // CHECKPOINT DETECTOR MANUAL + URUT BERDASARKAN NAMA // --
 local Tab = Window:CreateTab("Detect CP")
 local Section = Tab:CreateSection("- Mendeteksi Checkpoint Terdekat Yang Tersedia -")
 
--- Simpan daftar tombol checkpoint agar bisa dihapus saat refresh
 local checkpointButtons = {}
 
--- Fungsi untuk mendeteksi dan menampilkan checkpoint
 local function detectCheckpoints()
-    -- Hapus tombol lama
     for _, btn in pairs(checkpointButtons) do
         btn:Destroy()
     end
     checkpointButtons = {}
 
-    -- Cari checkpoint di workspace
     local checkpoints = {}
     for _, obj in pairs(workspace:GetDescendants()) do
         if obj:IsA("Part") or obj:IsA("Model") then
@@ -1660,19 +1655,16 @@ local function detectCheckpoints()
         end
     end
 
-    -- Jika tidak ada checkpoint ditemukan
     if #checkpoints == 0 then
         local noCP = Tab:CreateLabel("❌ Tidak ada checkpoint ditemukan di Map ini.")
         table.insert(checkpointButtons, noCP)
         return
     end
 
-    -- Urutkan berdasarkan nama checkpoint
     table.sort(checkpoints, function(a, b)
         return a.Name:lower() < b.Name:lower()
     end)
 
-    -- Tampilkan checkpoint yang ditemukan
     for i, cp in ipairs(checkpoints) do
         local button = Tab:CreateButton({
             Name = "📍 " .. cp.Name,
@@ -1681,7 +1673,6 @@ local function detectCheckpoints()
                 if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
                     local targetPos
 
-                    -- Jika checkpoint berupa Model
                     if cp:IsA("Model") then
                         if cp.PrimaryPart then
                             targetPos = cp.PrimaryPart.Position
@@ -1720,7 +1711,6 @@ local function detectCheckpoints()
     table.insert(checkpointButtons, doneLabel)
 end
 
--- Tombol untuk memindai checkpoint (manual)
 local detectButton = Tab:CreateButton({
     Name = "Deteksi Checkpoint Terdekat",
     Callback = function()
@@ -1733,7 +1723,6 @@ local detectButton = Tab:CreateButton({
     end
 })
 
--- Tombol Refresh (opsional)
 local refreshButton = Tab:CreateButton({
     Name = "Refresh Daftar Checkpoint",
     Callback = function()
