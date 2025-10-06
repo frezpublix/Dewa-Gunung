@@ -1634,134 +1634,120 @@ Toggle_Y = Tab:CreateToggle({
     end,
 })
 
--- // MANUAL CHECKPOINT DETECTOR (REFRESH FIX) // --
+--local Tab = Window:CreateTab("Detect Nearby CP")
+--
+--local autoDetect = false
+--
+-- Simpan data
+--local checkpointButtons = {}
+--local checkpointList = {}
+--
+--local function clearCheckpointButtons()
+--	for _, btn in ipairs(checkpointButtons) do
+--		if btn and btn.Remove then
+--			btn:Remove()
+--		end
+--	end
+--	checkpointButtons = {}
+--end
+--
+--local function extractNumber(name)
+--	local num = string.match(name, "%d+")
+--	return num and tonumber(num) or math.huge
+--end
+--
+--local function buildCheckpointList()
+--	checkpointList = {}
+--
+--	for _, obj in pairs(workspace:GetDescendants()) do
+--		if obj:IsA("Part") or obj:IsA("Model") then
+--			local lname = string.lower(obj.Name)
+--			if lname:find("checkpoint") or lname:find("cp") then
+--				table.insert(checkpointList, obj)
+--			end
+--		end
+--	end
+--
+--	table.sort(checkpointList, function(a, b)
+--		local numA, numB = extractNumber(a.Name), extractNumber(b.Name)
+--		if numA == numB then
+--			return a.Name:lower() < b.Name:lower()
+--		else
+--			return numA < numB
+--		end
+--	end)
+--end
+--
+---local function displayCheckpointList()
+--	clearCheckpointButtons()
+--
+--	if #checkpointList == 0 then
+--		table.insert(checkpointButtons, Tab:CreateLabel("❌ Tidak ada checkpoint ditemukan."))
+--		return
+--	end
+--
+--	for _, cp in ipairs(checkpointList) do
+--		local btn = Tab:CreateButton({
+--			Name = "📍 " .. cp.Name,
+--			Callback = function()
+--				local player = game.Players.LocalPlayer
+--				local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+--				if not hrp then
+--					game.StarterGui:SetCore("SendNotification", {
+--						Title = "Teleport Gagal!",
+--						Text = "Karakter belum siap untuk teleport.",
+--						Duration = 3
+--					})
+--					return
+--				end
+--
+--				local pos
+--				if cp:IsA("Model") then
+--					pos = cp.PrimaryPart and cp.PrimaryPart.Position
+--					if not pos then
+--						local part = cp:FindFirstChildWhichIsA("BasePart")
+--						if part then pos = part.Position end
+--					end
+--				elseif cp:IsA("BasePart") then
+--					pos = cp.Position
+--				end
+--
+--				if pos then
+--					hrp.CFrame = CFrame.new(pos)
+--					game.StarterGui:SetCore("SendNotification", {
+--						Title = "Teleport Berhasil!",
+--						Text = "Berpindah ke " .. cp.Name,
+--						Duration = 3
+--					})
+--				else
+--					game.StarterGui:SetCore("SendNotification", {
+--						Title = "Teleport Gagal!",
+--						Text = "Posisi checkpoint tidak ditemukan.",
+--						Duration = 3
+--					})
+--				end
+--			end
+--		})
+--		table.insert(checkpointButtons, btn)
+--	end
+--
+--	table.insert(checkpointButtons, Tab:CreateLabel("✅ " .. #checkpointList .. " checkpoint ditemukan & diurutkan."))
+--end
 
-local Tab = Window:CreateTab("Detect Nearby CP")
-local Section = Tab:CreateSection("- Checkpoint Yang Tersedia -")
-
--- Simpan referensi hasil deteksi agar bisa dihapus nanti
-local checkpointElements = {}
-
--- Fungsi hapus daftar lama
-local function clearCheckpoints()
-	for _, ui in pairs(checkpointElements) do
-		if ui and ui.Destroy then
-			ui:Destroy()
-		end
-	end
-	checkpointElements = {}
-end
-
--- Fungsi ambil angka dari nama checkpoint (contoh: "Checkpoint 12" -> 12)
-local function extractNumber(name)
-	local num = string.match(name, "%d+")
-	return num and tonumber(num) or math.huge -- kalau tidak ada angka, taruh di akhir urutan
-end
-
--- Fungsi utama deteksi checkpoint
-local function detectCheckpoints()
-	clearCheckpoints() -- ✅ Hapus daftar lama sebelum menampilkan yang baru
-
-	local checkpoints = {}
-
-	-- Cari semua checkpoint di workspace
-	for _, obj in pairs(workspace:GetDescendants()) do
-		if obj:IsA("Part") or obj:IsA("Model") then
-			local lname = string.lower(obj.Name)
-			if lname:find("checkpoint") or lname:find("cp") then
-				table.insert(checkpoints, obj)
-			end
-		end
-	end
-
-	-- Jika tidak ada ditemukan checkpoint
-	if #checkpoints == 0 then
-		local noLabel = Tab:CreateLabel("❌ Tidak ada checkpoint ditemukan di Workspace.")
-		table.insert(checkpointElements, noLabel)
-		return
-	end
-
-	-- Urutkan checkpoint berdasarkan angka di namanya
-	table.sort(checkpoints, function(a, b)
-		local numA, numB = extractNumber(a.Name), extractNumber(b.Name)
-		if numA == numB then
-			return a.Name:lower() < b.Name:lower()
-		else
-			return numA < numB
-		end
-	end)
-
-	-- Tampilkan hasil checkpoint
-	for i, cp in ipairs(checkpoints) do
-		local btn = Tab:CreateButton({
-			Name = "📍 " .. cp.Name,
-			Callback = function()
-				local player = game.Players.LocalPlayer
-				if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-					local pos
-					if cp:IsA("Model") then
-						if cp.PrimaryPart then
-							pos = cp.PrimaryPart.Position
-						else
-							local first = cp:FindFirstChildWhichIsA("BasePart")
-							if first then pos = first.Position end
-						end
-					elseif cp:IsA("BasePart") then
-						pos = cp.Position
-					end
-
-					if pos then
-						player.Character:MoveTo(pos)
-						game.StarterGui:SetCore("SendNotification", {
-							Title = "Teleport Success!",
-							Text = "Berhasil ke " .. cp.Name,
-							Duration = 3
-						})
-					else
-						game.StarterGui:SetCore("SendNotification", {
-							Title = "Teleport Gagal!",
-							Text = "Posisi checkpoint tidak ditemukan.",
-							Duration = 3
-						})
-					end
-				end
-			end
-		})
-
-		table.insert(checkpointElements, btn)
-	end
-
-	local label = Tab:CreateLabel("✅ " .. #checkpoints .. " checkpoint ditemukan & diurutkan.")
-	table.insert(checkpointElements, label)
-end
-
--- Tombol manual deteksi pertama kali
-local detectBtn = Tab:CreateButton({
-	Name = "🔍 Deteksi Checkpoint",
-	Callback = function()
-		game.StarterGui:SetCore("SendNotification", {
-			Title = "Mendeteksi...",
-			Text = "Sedang mencari checkpoint di Workspace...",
-			Duration = 3
-		})
-		detectCheckpoints()
-	end
-})
-
--- Tombol refresh (hapus + deteksi ulang)
-local refreshBtn = Tab:CreateButton({
-	Name = "🔄 Refresh Daftar Checkpoint",
-	Callback = function()
-		game.StarterGui:SetCore("SendNotification", {
-			Title = "Memperbarui...",
-			Text = "Daftar checkpoint diperbarui!",
-			Duration = 3
-		})
-
-		clearCheckpoints() -- ✅ Hapus semua checkpoint lama sebelum memindai lagi
-		detectCheckpoints() -- ✅ Scan ulang checkpoint baru
-	end
-})
-
+--Tab:CreateButton({
+--	Name = "🔍 Deteksi Checkpoint",
+--	Callback = function()
+--		buildCheckpointList()
+--		displayCheckpointList()
+--
+--		game.StarterGui:SetCore("SendNotification", {
+--			Title = "Selesai!",
+--			Text = "Checkpoint berhasil dideteksi (" .. tostring(#checkpointList) .. ").",
+--			Duration = 3
+--		})
+--	end
+--})
+--
+--local Section = Tab:CreateLabel("- Checkpoint Yang Tersedia -\n(hanya gunakan jika map yang kamu mainkan tidak tersedia di daftar.)")
 
 Rayfield:LoadConfiguration()
