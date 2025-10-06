@@ -1755,6 +1755,7 @@ local refreshBtn = Tab:CreateButton({
 			Text = "Checkpoint diperbarui.",
 			Duration = 3
 		})
+			
         clearCheckpoints()
 		detectCheckpoints()
 	end
