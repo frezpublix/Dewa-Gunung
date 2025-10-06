@@ -1746,7 +1746,6 @@ local detectBtn = Tab:CreateButton({
 	end
 })
 
--- Tombol refresh
 local refreshBtn = Tab:CreateButton({
 	Name = "Refresh Daftar Checkpoint",
 	Callback = function()
