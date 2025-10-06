@@ -1735,7 +1735,7 @@ end
 
 -- Tombol untuk memindai checkpoint (manual)
 local detectBtn = Tab:CreateButton({
-	Name = "🔍 Deteksi Checkpoint",
+	Name = "Deteksi Checkpoint",
 	Callback = function()
 		game.StarterGui:SetCore("SendNotification", {
 			Title = "Mendeteksi...",
@@ -1748,13 +1748,14 @@ local detectBtn = Tab:CreateButton({
 
 -- Tombol refresh
 local refreshBtn = Tab:CreateButton({
-	Name = "🔄 Refresh Daftar Checkpoint",
+	Name = "Refresh Daftar Checkpoint",
 	Callback = function()
 		game.StarterGui:SetCore("SendNotification", {
 			Title = "Memperbarui...",
 			Text = "Checkpoint diperbarui.",
 			Duration = 3
 		})
+        clearCheckpoints()
 		detectCheckpoints()
 	end
 })
