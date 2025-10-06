@@ -1634,11 +1634,14 @@ Toggle_Y = Tab:CreateToggle({
     end,
 })
 
-local Tab = Window:CreateTab("Detect Nearby CP")
-local Section = Tab:CreateSection("- Checkpoint Yang Tersedia -")
+-- // CHECKPOINT DETECTOR MANUAL + URUT BERDASARKAN NAMA // --
+local Tab = Window:CreateTab("Detect CP")
+local Section = Tab:CreateSection("- Mendeteksi Checkpoint Terdekat Yang Tersedia -")
 
+-- Simpan daftar tombol checkpoint agar bisa dihapus saat refresh
 local checkpointButtons = {}
 
+-- Fungsi untuk mendeteksi dan menampilkan checkpoint
 local function detectCheckpoints()
     -- Hapus tombol lama
     for _, btn in pairs(checkpointButtons) do
@@ -1657,12 +1660,17 @@ local function detectCheckpoints()
         end
     end
 
-    -- Jika tidak ada checkpoint terdeteksi
+    -- Jika tidak ada checkpoint ditemukan
     if #checkpoints == 0 then
-        local noCP = Tab:CreateLabel("❌ Tidak ada checkpoint ditemukan di Workspace.")
+        local noCP = Tab:CreateLabel("❌ Tidak ada checkpoint ditemukan di Map ini.")
         table.insert(checkpointButtons, noCP)
         return
     end
+
+    -- Urutkan berdasarkan nama checkpoint
+    table.sort(checkpoints, function(a, b)
+        return a.Name:lower() < b.Name:lower()
+    end)
 
     -- Tampilkan checkpoint yang ditemukan
     for i, cp in ipairs(checkpoints) do
@@ -1671,14 +1679,13 @@ local function detectCheckpoints()
             Callback = function()
                 local player = game.Players.LocalPlayer
                 if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-                    local targetPos = nil
+                    local targetPos
 
-                    -- Jika checkpoint berupa Model, ambil PrimaryPart atau posisinya
+                    -- Jika checkpoint berupa Model
                     if cp:IsA("Model") then
                         if cp.PrimaryPart then
                             targetPos = cp.PrimaryPart.Position
                         else
-                            -- cari part dalam model
                             local firstPart = cp:FindFirstChildWhichIsA("BasePart")
                             if firstPart then
                                 targetPos = firstPart.Position
@@ -1698,7 +1705,7 @@ local function detectCheckpoints()
                     else
                         game.StarterGui:SetCore("SendNotification", {
                             Title = "Teleport Gagal!",
-                            Text = "Checkpoint " .. cp.Name .. " tidak punya posisi yang valid.",
+                            Text = "Checkpoint " .. cp.Name .. " tidak punya posisi valid.",
                             Duration = 4
                         })
                     end
@@ -1709,24 +1716,34 @@ local function detectCheckpoints()
         table.insert(checkpointButtons, button)
     end
 
-    local doneLabel = Tab:CreateLabel("✅ " .. #checkpoints .. " checkpoint ditemukan.")
+    local doneLabel = Tab:CreateLabel("✅ " .. #checkpoints .. " checkpoint ditemukan & diurutkan.")
     table.insert(checkpointButtons, doneLabel)
 end
 
--- Tombol Refresh
-local refreshButton = Tab:CreateButton({
-    Name = "🔄 Refresh Checkpoint",
+-- Tombol untuk memindai checkpoint (manual)
+local detectButton = Tab:CreateButton({
+    Name = "🔍 Deteksi Checkpoint",
     Callback = function()
         game.StarterGui:SetCore("SendNotification", {
-            Title = "Memindai Ulang...",
-            Text = "Mendeteksi ulang semua checkpoint di Workspace...",
+            Title = "Memindai Checkpoint...",
+            Text = "Sedang mencari checkpoint di Map ini...",
             Duration = 3
         })
         detectCheckpoints()
     end
 })
 
--- Jalankan deteksi pertama kali saat tab dibuka
-detectCheckpoints()
+-- Tombol Refresh (opsional)
+local refreshButton = Tab:CreateButton({
+    Name = "🔄 Refresh Daftar Checkpoint",
+    Callback = function()
+        game.StarterGui:SetCore("SendNotification", {
+            Title = "Memperbarui...",
+            Text = "Mendeteksi ulang checkpoint.",
+            Duration = 3
+        })
+        detectCheckpoints()
+    end
+})
 
 Rayfield:LoadConfiguration()
