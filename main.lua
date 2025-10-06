@@ -367,7 +367,7 @@ local function tpToTarget(targetPlayer)
     return false, "Gagal teleport (CFrame/PivotTo/MoveTo). Mungkin diblokir anti-teleport."
 end
 
-local PlayerTab = Window:CreateTab("👥 Players", nil)
+local PlayerTab = Window:CreateTab("Players", nil)
 
 local optionToPlayer = {}
 local selectedLabel  = nil
@@ -1633,5 +1633,100 @@ Toggle_Y = Tab:CreateToggle({
         end
     end,
 })
+
+local Tab = Window:CreateTab("Detect Nearby CP")
+local Section = Tab:CreateSection("- Checkpoint Yang Tersedia -")
+
+local checkpointButtons = {}
+
+local function detectCheckpoints()
+    -- Hapus tombol lama
+    for _, btn in pairs(checkpointButtons) do
+        btn:Destroy()
+    end
+    checkpointButtons = {}
+
+    -- Cari checkpoint di workspace
+    local checkpoints = {}
+    for _, obj in pairs(workspace:GetDescendants()) do
+        if obj:IsA("Part") or obj:IsA("Model") then
+            local name = string.lower(obj.Name)
+            if name:find("checkpoint") or name:find("cp") then
+                table.insert(checkpoints, obj)
+            end
+        end
+    end
+
+    -- Jika tidak ada checkpoint terdeteksi
+    if #checkpoints == 0 then
+        local noCP = Tab:CreateLabel("❌ Tidak ada checkpoint ditemukan di Workspace.")
+        table.insert(checkpointButtons, noCP)
+        return
+    end
+
+    -- Tampilkan checkpoint yang ditemukan
+    for i, cp in ipairs(checkpoints) do
+        local button = Tab:CreateButton({
+            Name = "📍 " .. cp.Name,
+            Callback = function()
+                local player = game.Players.LocalPlayer
+                if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                    local targetPos = nil
+
+                    -- Jika checkpoint berupa Model, ambil PrimaryPart atau posisinya
+                    if cp:IsA("Model") then
+                        if cp.PrimaryPart then
+                            targetPos = cp.PrimaryPart.Position
+                        else
+                            -- cari part dalam model
+                            local firstPart = cp:FindFirstChildWhichIsA("BasePart")
+                            if firstPart then
+                                targetPos = firstPart.Position
+                            end
+                        end
+                    elseif cp:IsA("Part") then
+                        targetPos = cp.Position
+                    end
+
+                    if targetPos then
+                        player.Character:MoveTo(targetPos)
+                        game.StarterGui:SetCore("SendNotification", {
+                            Title = "Teleport Success!",
+                            Text = "Berhasil ke " .. cp.Name,
+                            Duration = 4
+                        })
+                    else
+                        game.StarterGui:SetCore("SendNotification", {
+                            Title = "Teleport Gagal!",
+                            Text = "Checkpoint " .. cp.Name .. " tidak punya posisi yang valid.",
+                            Duration = 4
+                        })
+                    end
+                end
+            end
+        })
+
+        table.insert(checkpointButtons, button)
+    end
+
+    local doneLabel = Tab:CreateLabel("✅ " .. #checkpoints .. " checkpoint ditemukan.")
+    table.insert(checkpointButtons, doneLabel)
+end
+
+-- Tombol Refresh
+local refreshButton = Tab:CreateButton({
+    Name = "🔄 Refresh Checkpoint",
+    Callback = function()
+        game.StarterGui:SetCore("SendNotification", {
+            Title = "Memindai Ulang...",
+            Text = "Mendeteksi ulang semua checkpoint di Workspace...",
+            Duration = 3
+        })
+        detectCheckpoints()
+    end
+})
+
+-- Jalankan deteksi pertama kali saat tab dibuka
+detectCheckpoints()
 
 Rayfield:LoadConfiguration()
