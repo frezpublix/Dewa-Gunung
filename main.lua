@@ -1634,10 +1634,12 @@ Toggle_Y = Tab:CreateToggle({
     end,
 })
 
+-- // MANUAL CHECKPOINT DETECTOR (REFRESH FIX) // --
+
 local Tab = Window:CreateTab("Detect Nearby CP")
 local Section = Tab:CreateSection("- Checkpoint Yang Tersedia -")
 
--- Simpan referensi hasil deteksi agar bisa dihapus
+-- Simpan referensi hasil deteksi agar bisa dihapus nanti
 local checkpointElements = {}
 
 -- Fungsi hapus daftar lama
@@ -1650,15 +1652,15 @@ local function clearCheckpoints()
 	checkpointElements = {}
 end
 
--- Fungsi ambil angka dari nama checkpoint
+-- Fungsi ambil angka dari nama checkpoint (contoh: "Checkpoint 12" -> 12)
 local function extractNumber(name)
 	local num = string.match(name, "%d+")
-	return num and tonumber(num) or math.huge -- jika tidak ada angka, taruh di akhir
+	return num and tonumber(num) or math.huge -- kalau tidak ada angka, taruh di akhir urutan
 end
 
 -- Fungsi utama deteksi checkpoint
 local function detectCheckpoints()
-	clearCheckpoints()
+	clearCheckpoints() -- ✅ Hapus daftar lama sebelum menampilkan yang baru
 
 	local checkpoints = {}
 
@@ -1672,14 +1674,14 @@ local function detectCheckpoints()
 		end
 	end
 
-	-- Jika tidak ditemukan
+	-- Jika tidak ada ditemukan checkpoint
 	if #checkpoints == 0 then
 		local noLabel = Tab:CreateLabel("❌ Tidak ada checkpoint ditemukan di Workspace.")
 		table.insert(checkpointElements, noLabel)
 		return
 	end
 
-	-- Urutkan berdasarkan angka di nama checkpoint
+	-- Urutkan checkpoint berdasarkan angka di namanya
 	table.sort(checkpoints, function(a, b)
 		local numA, numB = extractNumber(a.Name), extractNumber(b.Name)
 		if numA == numB then
@@ -1689,7 +1691,7 @@ local function detectCheckpoints()
 		end
 	end)
 
-	-- Tampilkan hasil
+	-- Tampilkan hasil checkpoint
 	for i, cp in ipairs(checkpoints) do
 		local btn = Tab:CreateButton({
 			Name = "📍 " .. cp.Name,
@@ -1733,9 +1735,9 @@ local function detectCheckpoints()
 	table.insert(checkpointElements, label)
 end
 
--- Tombol untuk memindai checkpoint (manual)
+-- Tombol manual deteksi pertama kali
 local detectBtn = Tab:CreateButton({
-	Name = "Deteksi Checkpoint",
+	Name = "🔍 Deteksi Checkpoint",
 	Callback = function()
 		game.StarterGui:SetCore("SendNotification", {
 			Title = "Mendeteksi...",
@@ -1746,18 +1748,20 @@ local detectBtn = Tab:CreateButton({
 	end
 })
 
+-- Tombol refresh (hapus + deteksi ulang)
 local refreshBtn = Tab:CreateButton({
-	Name = "Refresh Daftar Checkpoint",
+	Name = "🔄 Refresh Daftar Checkpoint",
 	Callback = function()
 		game.StarterGui:SetCore("SendNotification", {
 			Title = "Memperbarui...",
-			Text = "Checkpoint diperbarui.",
+			Text = "Daftar checkpoint diperbarui!",
 			Duration = 3
 		})
-			
-        clearCheckpoints()
-		detectCheckpoints()
+
+		clearCheckpoints() -- ✅ Hapus semua checkpoint lama sebelum memindai lagi
+		detectCheckpoints() -- ✅ Scan ulang checkpoint baru
 	end
 })
+
 
 Rayfield:LoadConfiguration()
