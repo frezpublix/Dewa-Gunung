@@ -1746,4 +1746,5 @@ local refreshButton = Tab:CreateButton({
     end
 })
 
+
 Rayfield:LoadConfiguration()
