@@ -7,3 +7,5 @@ loadstring(game:HttpGet("https://pastefy.app/YhS4CMJk/raw"))()
 -- Fly Hack (Control dengan WASD + Mouse Shift Lock / Klik Kanan, kecepatan terbang bisa di adjust)
 -- Walk Speed Controller (Bisa mengubah kecepatan Walk Speed sesuka hati, apabila ingin menggunakan Walk Speed jangan pakai Coil/Sprint)
 -- FITUR BARU AKAN SEGERA HADIR
+
+-- Made with ❤️ by frezpublix
