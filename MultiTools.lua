@@ -10,4 +10,4 @@ loadstring(game:HttpGet("https://pastefy.app/YhS4CMJk/raw"))()
 -- 🔹 CHANGELOGS v1.1
 -- Menambahkan fitur Minimize Tombol (K)
 
--- Made with ❤️ by frezpublix
+-- Made with ❤️ by Fanbez
