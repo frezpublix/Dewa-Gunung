@@ -40,7 +40,7 @@ local teleportPoints = {
 }
 
 -- Waktu cooldown global (detik)
-local COOLDOWN_TIME = 5
+local COOLDOWN_TIME = 0
 local isGlobalCooldown = false -- status cooldown global
 local currentCheckpoint = "Basecamp"
 
