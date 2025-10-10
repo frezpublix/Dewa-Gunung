@@ -13,5 +13,12 @@ loadstring(game:HttpGet("https://pastefy.app/YhS4CMJk/raw"))()
 1. Menambahkan efek welcome musik ketika inject menu
 2. Menambahkan tombol EXIT MENU yang akan menonaktifkan semua script secara menyeluruh (bukan minimize)
 
+🔹 CHANGELOGS v1.5
+1. Menmabahkan fungsi Grab Coordinate
+2. Menambahkan fungsi Copy/Paste Coordinate
+3. Menambahkan fungsi Teleport to Coordinate
+4. Pemindahan Catatan Footer ke tab Teleport
+5. Penambahan efek Animasi Gradasi setelah Inject
+
 Made with ❤️ by Fanbez
 ]]
